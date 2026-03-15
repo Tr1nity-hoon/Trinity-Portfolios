@@ -216,16 +216,6 @@
           </div>
         </section>
 
-        <!-- Quick Heatmap Preview -->
-        <section class="section">
-          <div class="section-header">
-            <h2 class="section-title">S&P 500 Heatmap</h2>
-            <a href="#" class="section-link" data-page="heatmap">Full map →</a>
-          </div>
-          <div class="heatmap-preview" id="heatmapPreview">
-            <!-- Populated by JS -->
-          </div>
-        </section>
       </div>
 
       <!-- MARKETS PAGE -->
@@ -339,13 +329,18 @@
       <div class="page" id="page-earnings">
         <div class="page-header">
           <h1 class="page-title">Earnings Calendar</h1>
-          <div class="section-tabs">
-            <button class="tab active">This Week</button>
-            <button class="tab">Next Week</button>
-            <button class="tab">Past</button>
+          <div class="section-tabs" id="earningsTabs">
+            <button class="tab active" data-earnings-tab="upcoming">Upcoming</button>
+            <button class="tab" data-earnings-tab="reported">Reported</button>
+            <button class="tab" data-earnings-tab="all">All</button>
           </div>
         </div>
-        <div class="earnings-grid" id="earningsGrid">
+        <!-- Earnings Summary Stats -->
+        <div class="earnings-stats" id="earningsStats">
+          <!-- Populated by JS -->
+        </div>
+        <!-- Earnings Timeline -->
+        <div class="earnings-timeline" id="earningsTimeline">
           <!-- Populated by JS -->
         </div>
       </div>
