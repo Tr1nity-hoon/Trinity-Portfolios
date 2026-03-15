@@ -863,7 +863,7 @@ table { border-collapse: collapse; width: 100%; }
 
 .holding-item {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
   align-items: center;
   padding: 14px 16px;
   border-bottom: 1px solid var(--border-subtle);
@@ -2032,4 +2032,206 @@ table { border-collapse: collapse; width: 100%; }
 /* --- Google Signing In Spinner --- */
 .spinning-icon {
   animation: spin 1s linear infinite;
+}
+
+/* --- Edit Holding Modal --- */
+.edit-holding-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.edit-holding-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.edit-holding-close {
+  font-size: 24px;
+  color: var(--text-tertiary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+}
+
+.edit-holding-close:hover {
+  color: var(--text-primary);
+}
+
+.edit-holding-form {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.edit-holding-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  background: var(--negative-bg);
+  color: var(--negative);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-danger:hover {
+  background: var(--negative);
+  color: #fff;
+}
+
+/* --- AI Answer Card --- */
+.ai-answer {
+  padding: 20px;
+}
+
+.ai-answer-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ai-answer-body {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.ai-answer-body p {
+  margin-bottom: 8px;
+}
+
+.ai-answer-body p:last-child {
+  margin-bottom: 0;
+}
+
+.ai-stock-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.ai-stock-card:hover {
+  background: var(--bg-card-hover);
+}
+
+.ai-stock-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-stock-details h4 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ai-stock-details span {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.ai-stock-price {
+  text-align: right;
+}
+
+.ai-stock-price-val {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.ai-stock-price-change {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+/* Holding actions */
+.holding-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.holding-edit-btn,
+.holding-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background: none;
+  border: none;
+}
+
+.holding-edit-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--accent);
+}
+
+.holding-delete-btn:hover {
+  background: var(--negative-bg);
+  color: var(--negative);
+}
+
+/* Watchlist remove button */
+.watchlist-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0;
+  transition: all var(--transition-fast);
+  z-index: 2;
+}
+
+.watchlist-card:hover .watchlist-remove {
+  opacity: 1;
+}
+
+.watchlist-remove:hover {
+  background: var(--negative);
+  color: #fff;
+  border-color: var(--negative);
 }

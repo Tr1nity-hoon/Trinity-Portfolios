@@ -161,7 +161,7 @@
             <div class="search-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </div>
-            <input type="text" class="search-input" placeholder="Ask anything about markets..." id="searchInput">
+            <input type="text" class="search-input" placeholder="Ask anything about markets..." id="searchInput" readonly>
             <div class="search-shortcut">
               <kbd>⌘</kbd><kbd>K</kbd>
             </div>
@@ -278,9 +278,9 @@
       <div class="page" id="page-portfolio">
         <div class="page-header">
           <h1 class="page-title">Portfolio</h1>
-          <button class="btn-primary" id="newPortfolioBtn">
+          <button class="btn-primary" id="addHoldingBtn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            New Portfolio
+            Add Holding
           </button>
         </div>
 
@@ -364,39 +364,58 @@
         </div>
       </div>
 
-      <!-- AI Search Modal -->
-      <div class="search-modal" id="searchModal">
-        <div class="search-modal-overlay" id="searchModalOverlay"></div>
-        <div class="search-modal-content">
-          <div class="search-modal-input-wrap">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" class="search-modal-input" placeholder="Ask about any stock, market, or financial topic..." id="modalSearchInput">
-            <kbd class="search-modal-esc">ESC</kbd>
-          </div>
-          <div class="search-modal-results" id="searchResults">
-            <div class="search-quick-links">
-              <p class="search-quick-label">Popular searches</p>
-              <a href="#" class="search-quick-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-                NVDA stock analysis
-              </a>
-              <a href="#" class="search-quick-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-                Compare AAPL vs MSFT
-              </a>
-              <a href="#" class="search-quick-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-                Best performing ETFs this year
-              </a>
-              <a href="#" class="search-quick-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-                Impact of tariffs on semiconductor stocks
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
     </main>
+
+    <!-- AI Search Modal (outside main for proper positioning) -->
+    <div class="search-modal" id="searchModal">
+      <div class="search-modal-overlay" id="searchModalOverlay"></div>
+      <div class="search-modal-content">
+        <div class="search-modal-input-wrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-modal-input" placeholder="Ask about any stock, market, or financial topic..." id="modalSearchInput">
+          <kbd class="search-modal-esc">ESC</kbd>
+        </div>
+        <div class="search-modal-results" id="searchResults"></div>
+      </div>
+    </div>
+
+    <!-- Stock Picker Modal (for add to portfolio/watchlist) -->
+    <div class="search-modal" id="stockPickerModal">
+      <div class="search-modal-overlay" id="stockPickerOverlay"></div>
+      <div class="search-modal-content">
+        <div class="search-modal-input-wrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-modal-input" placeholder="Search for a stock to add..." id="stockPickerInput">
+          <kbd class="search-modal-esc">ESC</kbd>
+        </div>
+        <div class="search-modal-results" id="stockPickerResults"></div>
+      </div>
+    </div>
+
+    <!-- Edit Holding Modal -->
+    <div class="search-modal" id="editHoldingModal">
+      <div class="search-modal-overlay" id="editHoldingOverlay"></div>
+      <div class="search-modal-content" style="max-width:420px">
+        <div class="edit-holding-header">
+          <h3 class="edit-holding-title" id="editHoldingTitle">Edit Holding</h3>
+          <button class="edit-holding-close" id="editHoldingClose">&times;</button>
+        </div>
+        <form class="edit-holding-form" id="editHoldingForm">
+          <div class="form-group">
+            <label class="form-label">Shares</label>
+            <input type="number" class="form-input" id="editShares" min="0" step="any" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Average Cost ($)</label>
+            <input type="number" class="form-input" id="editAvgCost" min="0" step="0.01" required>
+          </div>
+          <div class="edit-holding-actions">
+            <button type="button" class="btn-danger" id="editHoldingDelete">Remove</button>
+            <button type="submit" class="btn-primary" style="flex:1">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <script src="./assets/app.js"></script>
   </body>
