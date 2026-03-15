@@ -11,60 +11,109 @@
     <link rel="stylesheet" href="./assets/style.css">
   </head>
   <body>
-    <!-- LOGIN PAGE -->
+    <!-- LOGIN PAGE — Split Panel -->
     <div class="login-page" id="loginPage">
-      <div class="login-container">
-        <div class="login-card">
-          <div class="login-header">
-            <div class="login-logo">
-              <svg width="36" height="36" viewBox="0 0 28 28" fill="none">
-                <path d="M14 2L2 8v12l12 6 12-6V8L14 2z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                <path d="M14 2v24M2 8l12 6 12-6" stroke="currentColor" stroke-width="1.5" fill="none"/>
-              </svg>
-              <span class="login-logo-text">Trinity</span>
-            </div>
-            <h1 class="login-title">Welcome back</h1>
-            <p class="login-subtitle">Sign in to access your portfolios and market data</p>
-          </div>
-
-          <!-- Google Sign-In Button -->
-          <button class="btn-google" id="googleSignIn">
-            <svg width="18" height="18" viewBox="0 0 18 18">
-              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-              <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
-              <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.997 8.997 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 2.58 9 2.58z" fill="#EA4335"/>
+      <!-- Left: Branding -->
+      <div class="login-left">
+        <div class="login-brand">
+          <div class="login-brand-logo">
+            <svg viewBox="0 0 28 28" fill="none">
+              <path d="M14 2L2 8v12l12 6 12-6V8L14 2z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <path d="M14 2v24M2 8l12 6 12-6" stroke="currentColor" stroke-width="1.5" fill="none"/>
             </svg>
-            Continue with Google
-          </button>
-
-          <div class="login-divider">
-            <span>or</span>
+            <span>Trinity</span>
           </div>
+          <h1 class="login-tagline">Track, analyze, and grow your portfolio</h1>
+          <p class="login-tagline-sub">Real-time market data, AI-powered insights, and powerful portfolio management tools.</p>
+          <div class="login-features">
+            <div class="login-feature">
+              <div class="login-feature-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+              <div class="login-feature-text">
+                <h4>Live Market Data</h4>
+                <p>Real-time prices via Finnhub API</p>
+              </div>
+            </div>
+            <div class="login-feature">
+              <div class="login-feature-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 8v8l10 6 10-6V8L12 2z"/><path d="M12 22V12"/><path d="M2 8l10 4 10-4"/></svg>
+              </div>
+              <div class="login-feature-text">
+                <h4>AI-Powered Insights</h4>
+                <p>Ask anything about markets</p>
+              </div>
+            </div>
+            <div class="login-feature">
+              <div class="login-feature-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+              </div>
+              <div class="login-feature-text">
+                <h4>Portfolio Tracking</h4>
+                <p>Manage holdings and watchlists</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          <!-- Email/Password Form -->
-          <form class="login-form" id="loginForm">
-            <div class="form-group">
-              <label class="form-label" for="loginEmail">Email</label>
-              <input type="email" class="form-input" id="loginEmail" placeholder="you@example.com" required>
+      <!-- Right: Auth Form -->
+      <div class="login-right">
+        <div class="login-container">
+          <div class="login-card">
+            <div class="login-header">
+              <h1 class="login-title">Welcome back</h1>
+              <p class="login-subtitle">Sign in to access your portfolios and market data</p>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="loginPassword">Password</label>
-              <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" required>
-            </div>
-            <div class="form-row">
-              <label class="form-checkbox">
-                <input type="checkbox" id="rememberMe">
-                <span>Remember me</span>
-              </label>
-              <a href="#" class="form-link">Forgot password?</a>
-            </div>
-            <button type="submit" class="btn-login">Sign in</button>
-            <div class="login-error" id="loginError"></div>
-          </form>
 
-          <div class="login-footer">
-            <p>Don't have an account? <a href="#" class="form-link" id="showSignup">Sign up</a></p>
+            <!-- Google Sign-In Button -->
+            <button class="btn-google" id="googleSignIn">
+              <svg width="18" height="18" viewBox="0 0 18 18">
+                <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+                <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+                <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.997 8.997 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 2.58 9 2.58z" fill="#EA4335"/>
+              </svg>
+              Continue with Google
+            </button>
+
+            <div class="login-divider">
+              <span>or</span>
+            </div>
+
+            <!-- Email/Password Form -->
+            <form class="login-form" id="loginForm">
+              <div class="form-group">
+                <label class="form-label" for="loginEmail">Email</label>
+                <input type="email" class="form-input" id="loginEmail" placeholder="you@example.com" required>
+                <span class="form-input-hint" id="emailHint">Please enter a valid email address</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="loginPassword">Password</label>
+                <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" required>
+                <span class="form-input-hint" id="passwordHint">Password must be at least 6 characters</span>
+                <div class="password-strength" id="passwordStrength" style="display:none">
+                  <div class="password-strength-bar" id="pwBar1"></div>
+                  <div class="password-strength-bar" id="pwBar2"></div>
+                  <div class="password-strength-bar" id="pwBar3"></div>
+                  <div class="password-strength-bar" id="pwBar4"></div>
+                </div>
+                <span class="password-strength-text" id="pwStrengthText" style="display:none"></span>
+              </div>
+              <div class="form-row">
+                <label class="form-checkbox">
+                  <input type="checkbox" id="rememberMe">
+                  <span>Remember me</span>
+                </label>
+                <a href="#" class="form-link">Forgot password?</a>
+              </div>
+              <button type="submit" class="btn-login" id="loginBtn">Sign in</button>
+              <div class="login-error" id="loginError"></div>
+            </form>
+
+            <div class="login-footer">
+              <p>Don't have an account? <a href="#" class="form-link" id="showSignup">Sign up</a></p>
+            </div>
           </div>
         </div>
       </div>
@@ -155,7 +204,6 @@
     <main class="main-content" id="mainContent">
       <!-- HOME PAGE -->
       <div class="page active" id="page-home">
-        <!-- Search Section -->
         <div class="search-section">
           <div class="search-container">
             <div class="search-icon">
@@ -174,7 +222,6 @@
           </div>
         </div>
 
-        <!-- Market Overview -->
         <section class="section">
           <div class="section-header">
             <h2 class="section-title">Market Overview</h2>
@@ -184,17 +231,11 @@
               <button class="tab" data-market-tab="global">Global</button>
             </div>
           </div>
-          <div class="index-cards" id="indexCards">
-            <!-- Populated by JS -->
-          </div>
+          <div class="index-cards" id="indexCards"></div>
         </section>
 
-        <!-- Sentiment Indicator -->
-        <div class="sentiment-bar" id="sentimentBar">
-          <!-- Populated by JS -->
-        </div>
+        <div class="sentiment-bar" id="sentimentBar"></div>
 
-        <!-- Market Summary -->
         <section class="section">
           <div class="section-header">
             <h2 class="section-title">Market Summary</h2>
@@ -205,22 +246,16 @@
               </button>
             </div>
           </div>
-          <div class="summary-accordion" id="summaryAccordion">
-            <!-- Populated by JS -->
-          </div>
+          <div class="summary-accordion" id="summaryAccordion"></div>
         </section>
 
-        <!-- Trending Stocks -->
         <section class="section">
           <div class="section-header">
             <h2 class="section-title">Trending</h2>
             <a href="#" class="section-link" data-page="markets">View all →</a>
           </div>
-          <div class="stock-grid" id="trendingStocks">
-            <!-- Populated by JS -->
-          </div>
+          <div class="stock-grid" id="trendingStocks"></div>
         </section>
-
       </div>
 
       <!-- MARKETS PAGE -->
@@ -248,9 +283,7 @@
                 <th>Chart</th>
               </tr>
             </thead>
-            <tbody id="stockTableBody">
-              <!-- Populated by JS -->
-            </tbody>
+            <tbody id="stockTableBody"></tbody>
           </table>
         </div>
       </div>
@@ -269,9 +302,7 @@
           <div class="legend-gradient"></div>
           <span class="legend-label">+5%</span>
         </div>
-        <div class="heatmap-full" id="heatmapFull">
-          <!-- Populated by JS -->
-        </div>
+        <div class="heatmap-full" id="heatmapFull"></div>
       </div>
 
       <!-- PORTFOLIO PAGE -->
@@ -284,7 +315,6 @@
           </button>
         </div>
 
-        <!-- Portfolio Overview Cards -->
         <div class="portfolio-overview" id="portfolioOverview">
           <div class="portfolio-stat-card">
             <span class="stat-label">Total Value</span>
@@ -303,7 +333,6 @@
           </div>
         </div>
 
-        <!-- Portfolio Chart -->
         <div class="portfolio-chart-section">
           <div class="section-header">
             <h2 class="section-title">Performance</h2>
@@ -319,14 +348,11 @@
           </div>
         </div>
 
-        <!-- Holdings -->
         <div class="section">
           <div class="section-header">
             <h2 class="section-title">Holdings</h2>
           </div>
-          <div class="holdings-list" id="holdingsList">
-            <!-- Populated by JS -->
-          </div>
+          <div class="holdings-list" id="holdingsList"></div>
         </div>
       </div>
 
@@ -340,14 +366,8 @@
             <button class="tab" data-earnings-tab="all">All</button>
           </div>
         </div>
-        <!-- Earnings Summary Stats -->
-        <div class="earnings-stats" id="earningsStats">
-          <!-- Populated by JS -->
-        </div>
-        <!-- Earnings Timeline -->
-        <div class="earnings-timeline" id="earningsTimeline">
-          <!-- Populated by JS -->
-        </div>
+        <div class="earnings-stats" id="earningsStats"></div>
+        <div class="earnings-timeline" id="earningsTimeline"></div>
       </div>
 
       <!-- WATCHLIST PAGE -->
@@ -359,14 +379,12 @@
             Add Stock
           </button>
         </div>
-        <div class="watchlist-grid" id="watchlistGrid">
-          <!-- Populated by JS -->
-        </div>
+        <div class="watchlist-grid" id="watchlistGrid"></div>
       </div>
 
     </main>
 
-    <!-- AI Search Modal (outside main for proper positioning) -->
+    <!-- AI Search Modal -->
     <div class="search-modal" id="searchModal">
       <div class="search-modal-overlay" id="searchModalOverlay"></div>
       <div class="search-modal-content">
@@ -379,7 +397,7 @@
       </div>
     </div>
 
-    <!-- Stock Picker Modal (for add to portfolio/watchlist) -->
+    <!-- Stock Picker Modal -->
     <div class="search-modal" id="stockPickerModal">
       <div class="search-modal-overlay" id="stockPickerOverlay"></div>
       <div class="search-modal-content">

@@ -5,17 +5,17 @@
 const FINNHUB_KEY = 'd6ep8bhr01qksaq9dcb0d6ep8bhr01qksaq9dcbg';
 const FINNHUB_BASE = 'https://finnhub.io/api/v1';
 
-// --- Stock Logo Colors ---
+// --- Stock Logo Colors (Monotone grayscale) ---
 const LOGO_COLORS = {
-  NVDA: '#76b900', AAPL: '#555555', MSFT: '#00a4ef', AMZN: '#ff9900',
-  GOOGL: '#4285f4', META: '#0668E1', TSLA: '#cc0000', 'BRK.B': '#2d1a47',
-  JPM: '#003A70', V: '#1a1f71', UNH: '#002677', XOM: '#ed1b2d',
-  LLY: '#d52b1e', JNJ: '#d51900', AVGO: '#cc0000', PG: '#003cae',
-  MA: '#eb001b', HD: '#f96302', COST: '#005daa', NFLX: '#e50914',
-  CRM: '#00a1e0', AMD: '#ed1c24', WMT: '#0071ce', DIS: '#113ccf',
-  MU: '#0045a5', CVX: '#0051a5', BAC: '#012169', WFC: '#d71e28',
-  ABT: '#0072c6', CAT: '#ffcd11', GE: '#0073ce', RTX: '#0033a0',
-  BTC: '#f7931a', ETH: '#627eea', SOL: '#9945ff', BNB: '#f0b90b',
+  NVDA: '#6b6b6b', AAPL: '#555555', MSFT: '#7a7a7a', AMZN: '#888888',
+  GOOGL: '#666666', META: '#707070', TSLA: '#5a5a5a', 'BRK.B': '#4a4a4a',
+  JPM: '#505050', V: '#585858', UNH: '#525252', XOM: '#686868',
+  LLY: '#606060', JNJ: '#5e5e5e', AVGO: '#646464', PG: '#727272',
+  MA: '#6e6e6e', HD: '#7c7c7c', COST: '#767676', NFLX: '#484848',
+  CRM: '#6a6a6a', AMD: '#5c5c5c', WMT: '#808080', DIS: '#545454',
+  MU: '#626262', CVX: '#747474', BAC: '#4e4e4e', WFC: '#565656',
+  ABT: '#6c6c6c', CAT: '#787878', GE: '#7e7e7e', RTX: '#686868',
+  BTC: '#595959', ETH: '#636363', SOL: '#6d6d6d', BNB: '#737373',
 };
 
 function getStockLogo(symbol, size) {
@@ -341,12 +341,12 @@ function drawPortfolioChart() {
   ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--border-subtle').trim()||'#1a1a1a';
   ctx.lineWidth=0.5;
   for(let i=0;i<=4;i++){const y=(i/4)*h;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
-  const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'rgba(32,178,170,0.15)');g.addColorStop(1,'rgba(32,178,170,0)');
+  const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'rgba(212,212,216,0.12)');g.addColorStop(1,'rgba(212,212,216,0)');
   ctx.beginPath();ctx.moveTo(0,h);data.forEach((v,i)=>ctx.lineTo((i/(data.length-1))*w,h-((v-min)/range)*h));ctx.lineTo(w,h);ctx.closePath();ctx.fillStyle=g;ctx.fill();
   ctx.beginPath();data.forEach((v,i)=>{const x=(i/(data.length-1))*w,y=h-((v-min)/range)*h;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-  ctx.strokeStyle='#20b2aa';ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
+  ctx.strokeStyle='#a1a1aa';ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
   const lx=w,ly=h-((data[data.length-1]-min)/range)*h;
-  ctx.beginPath();ctx.arc(lx,ly,4,0,Math.PI*2);ctx.fillStyle='#20b2aa';ctx.fill();
+  ctx.beginPath();ctx.arc(lx,ly,4,0,Math.PI*2);ctx.fillStyle='#a1a1aa';ctx.fill();
 }
 
 let currentEarningsTab = 'upcoming';
@@ -700,17 +700,103 @@ function initAuth() {
 
   let isSignup = false;
 
+  // Inline validation helpers
+  function showHint(id, msg) {
+    const h = document.getElementById(id);
+    if (h) { h.textContent = msg; h.classList.add('visible'); }
+  }
+  function hideHint(id) {
+    const h = document.getElementById(id);
+    if (h) { h.textContent = ''; h.classList.remove('visible'); }
+  }
+  function setInputError(el, hasError) {
+    if (hasError) el.classList.add('input-error');
+    else el.classList.remove('input-error');
+  }
+
+  // Password strength
+  function checkPasswordStrength(pw) {
+    let score = 0;
+    if (pw.length >= 6) score++;
+    if (pw.length >= 10) score++;
+    if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    return Math.min(4, score);
+  }
+
+  function updatePasswordStrength(pw) {
+    const container = document.getElementById('passwordStrength');
+    const text = document.getElementById('pwStrengthText');
+    if (!isSignup || !container) return;
+    if (!pw) { container.style.display = 'none'; if (text) text.style.display = 'none'; return; }
+    container.style.display = 'flex';
+    if (text) text.style.display = 'block';
+    const score = checkPasswordStrength(pw);
+    const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+    const classes = ['', 'weak', 'medium', 'medium', 'strong'];
+    for (let i = 1; i <= 4; i++) {
+      const bar = document.getElementById('pwBar' + i);
+      if (bar) { bar.className = 'password-strength-bar'; if (i <= score) bar.classList.add(classes[score]); }
+    }
+    if (text) text.textContent = labels[score] || '';
+  }
+
+  // Attach inline validation events
+  const emailInput = document.getElementById('loginEmail');
+  const pwInput = document.getElementById('loginPassword');
+
+  emailInput.addEventListener('blur', function() {
+    if (this.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value)) {
+      setInputError(this, true);
+      showHint('emailHint', 'Please enter a valid email address');
+    } else {
+      setInputError(this, false);
+      hideHint('emailHint');
+    }
+  });
+
+  emailInput.addEventListener('input', function() {
+    setInputError(this, false);
+    hideHint('emailHint');
+  });
+
+  pwInput.addEventListener('input', function() {
+    setInputError(this, false);
+    hideHint('passwordHint');
+    updatePasswordStrength(this.value);
+  });
+
+  pwInput.addEventListener('blur', function() {
+    if (this.value && this.value.length < 6) {
+      setInputError(this, true);
+      showHint('passwordHint', 'Password must be at least 6 characters');
+    }
+  });
+
   function resetLoginForm(){
     isSignup=false;
-    const title=document.querySelector('.login-title'),sub=document.querySelector('.login-subtitle'),btn=document.querySelector('.btn-login'),footer=document.querySelector('.login-footer'),form=document.getElementById('loginForm'),err=document.getElementById('loginError');
+    const title=document.querySelector('.login-title'),sub=document.querySelector('.login-subtitle'),btn=document.getElementById('loginBtn'),footer=document.querySelector('.login-footer'),form=document.getElementById('loginForm'),err=document.getElementById('loginError');
     if(title)title.textContent='Welcome back';if(sub)sub.textContent='Sign in to access your portfolios and market data';if(btn)btn.textContent='Sign in';if(err)err.textContent='';if(form)form.reset();
+    hideHint('emailHint'); hideHint('passwordHint');
+    setInputError(emailInput, false); setInputError(pwInput, false);
+    const pwStr = document.getElementById('passwordStrength'); if(pwStr) pwStr.style.display='none';
+    const pwTxt = document.getElementById('pwStrengthText'); if(pwTxt) pwTxt.style.display='none';
     ['signupNameGroup','signupConfirmGroup','signupTermsRow'].forEach(id=>{const el=document.getElementById(id);if(el)el.remove();});
+    // Restore the form-row if it was replaced
+    const existingRow = form.querySelector('.form-row');
+    if (!existingRow) {
+      const fr = document.createElement('div'); fr.className='form-row';
+      fr.innerHTML='<label class="form-checkbox"><input type="checkbox" id="rememberMe"><span>Remember me</span></label><a href="#" class="form-link">Forgot password?</a>';
+      const btnEl = form.querySelector('.btn-login');
+      if (btnEl) form.insertBefore(fr, btnEl);
+    }
     if(footer){footer.innerHTML='<p>Don\'t have an account? <a href="#" class="form-link" id="showSignup">Sign up</a></p>';document.getElementById('showSignup').addEventListener('click',handleSignup);}
   }
 
   function handleSignup(e){
     e.preventDefault();isSignup=true;
-    const title=document.querySelector('.login-title'),sub=document.querySelector('.login-subtitle'),btn=document.querySelector('.btn-login'),footer=document.querySelector('.login-footer'),form=document.getElementById('loginForm'),err=document.getElementById('loginError');
+    const title=document.querySelector('.login-title'),sub=document.querySelector('.login-subtitle'),btn=document.getElementById('loginBtn'),footer=document.querySelector('.login-footer'),form=document.getElementById('loginForm'),err=document.getElementById('loginError');
     if(title)title.textContent='Create your account';if(sub)sub.textContent='Join Trinity Finance and start tracking your investments';if(btn)btn.textContent='Create account';if(err)err.textContent='';
     const emailGrp=form.querySelector('.form-group');
     if(emailGrp&&!document.getElementById('signupNameGroup')){const ng=document.createElement('div');ng.className='form-group';ng.id='signupNameGroup';ng.innerHTML='<label class="form-label" for="signupName">Full Name</label><input type="text" class="form-input" id="signupName" placeholder="John Doe" required>';emailGrp.parentNode.insertBefore(ng,emailGrp);}
@@ -718,6 +804,8 @@ function initAuth() {
     if(fr&&!document.getElementById('signupConfirmGroup')){const cg=document.createElement('div');cg.className='form-group';cg.id='signupConfirmGroup';cg.innerHTML='<label class="form-label" for="signupConfirm">Confirm Password</label><input type="password" class="form-input" id="signupConfirm" placeholder="Confirm your password" required>';fr.parentNode.insertBefore(cg,fr);}
     if(fr){fr.id='signupTermsRow';fr.innerHTML='<label class="form-checkbox"><input type="checkbox" id="agreeTerms"><span>I agree to the Terms of Service and Privacy Policy</span></label>';}
     if(footer){footer.innerHTML='<p>Already have an account? <a href="#" class="form-link" id="showLogin">Sign in</a></p>';document.getElementById('showLogin').addEventListener('click',e2=>{e2.preventDefault();resetLoginForm();});}
+    // Show password strength bar for signup
+    updatePasswordStrength(pwInput.value);
   }
 
   const eu=getUser(); if(eu)showApp(eu);else showLogin();
@@ -725,17 +813,38 @@ function initAuth() {
   document.getElementById('loginForm').addEventListener('submit',e=>{
     e.preventDefault();const err=document.getElementById('loginError');err.textContent='';
     const email=document.getElementById('loginEmail').value.trim(),pw=document.getElementById('loginPassword').value;
-    if(!email||!pw){err.textContent='Please fill in all fields.';return;}
-    if(pw.length<6){err.textContent='Password must be at least 6 characters.';return;}
+    const btn=document.getElementById('loginBtn');
+
+    // Inline validation
+    let valid = true;
+    if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+      setInputError(emailInput, true); showHint('emailHint', 'Please enter a valid email address'); valid=false;
+    }
+    if(!pw || pw.length<6){
+      setInputError(pwInput, true); showHint('passwordHint', 'Password must be at least 6 characters'); valid=false;
+    }
+    if(!valid) return;
+
     if(isSignup){
       const ni=document.getElementById('signupName'),ci=document.getElementById('signupConfirm'),ti=document.getElementById('agreeTerms');
       if(ni&&!ni.value.trim()){err.textContent='Please enter your name.';return;}
       if(ci&&ci.value!==pw){err.textContent='Passwords do not match.';return;}
       if(ti&&!ti.checked){err.textContent='Please agree to the Terms of Service.';return;}
-      setUser({name:ni?ni.value.trim():'User',email,provider:'email'});showApp({name:ni?ni.value.trim():'User',email});
+      // Loading state
+      btn.disabled=true;btn.textContent='Creating account...';
+      setTimeout(()=>{
+        setUser({name:ni?ni.value.trim():'User',email,provider:'email'});
+        btn.disabled=false;
+        showApp({name:ni?ni.value.trim():'User',email});
+      },500);
     }else{
-      const name=email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-      setUser({name,email,provider:'email'});showApp({name,email});
+      btn.disabled=true;btn.textContent='Signing in...';
+      setTimeout(()=>{
+        const name=email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+        setUser({name,email,provider:'email'});
+        btn.disabled=false;
+        showApp({name,email});
+      },500);
     }
   });
 
@@ -744,7 +853,7 @@ function initAuth() {
     const err=document.getElementById('loginError');if(err)err.textContent='';
     this.disabled=true;this.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spinning-icon"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Signing in...';
     const btn=this;
-    setTimeout(()=>{const u={name:'Google User',email:'user@gmail.com',provider:'google'};setUser(u);btn.disabled=false;btn.innerHTML='<svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.997 8.997 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 2.58 9 2.58z" fill="#EA4335"/></svg> Continue with Google';showApp(u);},600);
+    setTimeout(()=>{const u={name:'Google User',email:'user@gmail.com',provider:'google'};setUser(u);btn.disabled=false;btn.innerHTML='<svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.997 8.997 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 2.58 9 2.58z" fill="#EA4335"/></svg> Continue with Google';showApp(u);},800);
   });
 
   const sl=document.getElementById('showSignup');if(sl)sl.addEventListener('click',handleSignup);
