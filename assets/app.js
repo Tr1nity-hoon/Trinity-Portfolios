@@ -624,8 +624,109 @@ window.addEventListener('resize', () => {
   }, 250);
 });
 
+// --- Authentication ---
+function initAuth() {
+  const loginPage = document.getElementById('loginPage');
+  const loginForm = document.getElementById('loginForm');
+  const loginError = document.getElementById('loginError');
+  const googleSignIn = document.getElementById('googleSignIn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const userMenu = document.getElementById('userMenu');
+  const userAvatar = document.getElementById('userAvatar');
+  const userName = document.getElementById('userName');
+  const userEmail = document.getElementById('userEmail');
+
+  function getUser() {
+    const data = localStorage.getItem('trinity-user');
+    return data ? JSON.parse(data) : null;
+  }
+
+  function setUser(user) {
+    localStorage.setItem('trinity-user', JSON.stringify(user));
+  }
+
+  function clearUser() {
+    localStorage.removeItem('trinity-user');
+  }
+
+  function showApp(user) {
+    loginPage.classList.add('hidden');
+    if (user && userMenu) {
+      const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'U';
+      userAvatar.textContent = initials;
+      userName.textContent = user.name || 'User';
+      userEmail.textContent = user.email || '';
+      userMenu.style.display = 'flex';
+    }
+  }
+
+  function showLogin() {
+    loginPage.classList.remove('hidden');
+    if (userMenu) userMenu.style.display = 'none';
+  }
+
+  // Check existing session
+  const existingUser = getUser();
+  if (existingUser) {
+    showApp(existingUser);
+  }
+
+  // Email/password login
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    loginError.textContent = '';
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    if (!email || !password) {
+      loginError.textContent = 'Please enter both email and password.';
+      return;
+    }
+
+    if (password.length < 6) {
+      loginError.textContent = 'Password must be at least 6 characters.';
+      return;
+    }
+
+    // Simulate successful login
+    const user = {
+      name: email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+      email: email,
+      provider: 'email'
+    };
+    setUser(user);
+    showApp(user);
+  });
+
+  // Google Sign-In (simulated — shows the concept)
+  googleSignIn.addEventListener('click', () => {
+    loginError.textContent = '';
+    // In production, this would redirect to Google OAuth
+    const user = {
+      name: 'Google User',
+      email: 'user@gmail.com',
+      provider: 'google'
+    };
+    setUser(user);
+    showApp(user);
+  });
+
+  // Logout
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      clearUser();
+      showLogin();
+      // Reset form
+      loginForm.reset();
+      loginError.textContent = '';
+    });
+  }
+}
+
 // --- Initialize ---
 document.addEventListener('DOMContentLoaded', () => {
+  initAuth();
   renderIndexCards();
   renderTrendingStocks();
   renderHeatmapPreview();
