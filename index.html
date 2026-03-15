@@ -1,30 +1,332 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
-    <!--
-       ______                            __
-      / ____/___  ____ ___  ____  __  __/ /____  _____
-     / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
-    / /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
-    \____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
-                        /_/
-            Created with Perplexity Computer
-            https://www.perplexity.ai/computer
-    -->
-    <meta name="generator" content="Perplexity Computer">
-    <meta name="author" content="Perplexity Computer">
-    <meta property="og:see_also" content="https://www.perplexity.ai/computer">
-    <link rel="author" href="https://www.perplexity.ai/computer">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>Trinity Finance</title>
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Fira+Code:wght@300..700&family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Outfit:wght@100..900&family=Oxanium:wght@200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&family=Space+Grotesk:wght@300..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="./assets/index-Be0MQQNW.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-DeYuNECa.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/style.css">
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M14 2L2 8v12l12 6 12-6V8L14 2z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <path d="M14 2v24M2 8l12 6 12-6" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          </svg>
+          <span class="logo-text">Trinity</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-page="home">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Home</span>
+        </a>
+        <a href="#" class="nav-item" data-page="markets">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span>Markets</span>
+        </a>
+        <a href="#" class="nav-item" data-page="heatmap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          <span>Heatmap</span>
+        </a>
+        <a href="#" class="nav-item" data-page="portfolio">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+          <span>Portfolio</span>
+        </a>
+        <a href="#" class="nav-item" data-page="earnings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Earnings</span>
+        </a>
+        <a href="#" class="nav-item" data-page="watchlist">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Watchlist</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="icon-sun"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="icon-moon"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Mobile bottom nav -->
+    <nav class="mobile-nav" id="mobileNav">
+      <a href="#" class="mobile-nav-item active" data-page="home">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+      </a>
+      <a href="#" class="mobile-nav-item" data-page="markets">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span>Markets</span>
+      </a>
+      <a href="#" class="mobile-nav-item" data-page="heatmap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        <span>Heatmap</span>
+      </a>
+      <a href="#" class="mobile-nav-item" data-page="portfolio">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        <span>Portfolio</span>
+      </a>
+      <a href="#" class="mobile-nav-item" data-page="watchlist">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span>Watchlist</span>
+      </a>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+      <!-- HOME PAGE -->
+      <div class="page active" id="page-home">
+        <!-- Search Section -->
+        <div class="search-section">
+          <div class="search-container">
+            <div class="search-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <input type="text" class="search-input" placeholder="Ask anything about markets..." id="searchInput">
+            <div class="search-shortcut">
+              <kbd>⌘</kbd><kbd>K</kbd>
+            </div>
+          </div>
+          <div class="search-suggestions">
+            <button class="suggestion-chip">Impact of rate cuts on tech stocks</button>
+            <button class="suggestion-chip">Best dividend stocks 2026</button>
+            <button class="suggestion-chip">NVDA earnings analysis</button>
+            <button class="suggestion-chip">Crypto market outlook</button>
+          </div>
+        </div>
+
+        <!-- Market Overview -->
+        <section class="section">
+          <div class="section-header">
+            <h2 class="section-title">Market Overview</h2>
+            <div class="section-tabs">
+              <button class="tab active">US Market</button>
+              <button class="tab">Crypto</button>
+              <button class="tab">Global</button>
+            </div>
+          </div>
+          <div class="index-cards" id="indexCards">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
+        <!-- Market Summary -->
+        <section class="section">
+          <div class="section-header">
+            <h2 class="section-title">Market Summary</h2>
+            <span class="badge">AI Generated</span>
+          </div>
+          <div class="ai-summary-card" id="aiSummary">
+            <div class="ai-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a4 4 0 014 4c0 1.1-.9 2-2 2h-4c-1.1 0-2-.9-2-2a4 4 0 014-4z"/><path d="M8 8v8a4 4 0 004 4 4 4 0 004-4V8"/><line x1="6" y1="12" x2="18" y2="12"/></svg>
+            </div>
+            <p>U.S. equities rallied on Friday as the S&P 500 gained 1.2% following stronger-than-expected jobs data. Tech led the advance with NVDA up 4.3% on AI chip demand optimism. Treasury yields held steady at 4.25%, while the VIX dropped to 14.2, suggesting reduced market anxiety. The Fed is widely expected to hold rates at its next meeting.</p>
+          </div>
+        </section>
+
+        <!-- Trending Stocks -->
+        <section class="section">
+          <div class="section-header">
+            <h2 class="section-title">Trending</h2>
+            <a href="#" class="section-link" data-page="markets">View all →</a>
+          </div>
+          <div class="stock-grid" id="trendingStocks">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
+        <!-- Quick Heatmap Preview -->
+        <section class="section">
+          <div class="section-header">
+            <h2 class="section-title">S&P 500 Heatmap</h2>
+            <a href="#" class="section-link" data-page="heatmap">Full map →</a>
+          </div>
+          <div class="heatmap-preview" id="heatmapPreview">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+      </div>
+
+      <!-- MARKETS PAGE -->
+      <div class="page" id="page-markets">
+        <div class="page-header">
+          <h1 class="page-title">Markets</h1>
+          <div class="section-tabs">
+            <button class="tab active" data-market-filter="all">All</button>
+            <button class="tab" data-market-filter="gainers">Gainers</button>
+            <button class="tab" data-market-filter="losers">Losers</button>
+            <button class="tab" data-market-filter="active">Most Active</button>
+          </div>
+        </div>
+        <div class="stock-table-container">
+          <table class="stock-table" id="stockTable">
+            <thead>
+              <tr>
+                <th>Symbol</th>
+                <th>Name</th>
+                <th class="align-right">Price</th>
+                <th class="align-right">Change</th>
+                <th class="align-right">% Change</th>
+                <th class="align-right">Volume</th>
+                <th class="align-right">Market Cap</th>
+                <th>Chart</th>
+              </tr>
+            </thead>
+            <tbody id="stockTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- HEATMAP PAGE -->
+      <div class="page" id="page-heatmap">
+        <div class="page-header">
+          <h1 class="page-title">Market Heatmap</h1>
+          <div class="section-tabs">
+            <button class="tab active" data-heatmap-view="sector">By Sector</button>
+            <button class="tab" data-heatmap-view="size">By Market Cap</button>
+          </div>
+        </div>
+        <div class="heatmap-legend">
+          <span class="legend-label">-5%</span>
+          <div class="legend-gradient"></div>
+          <span class="legend-label">+5%</span>
+        </div>
+        <div class="heatmap-full" id="heatmapFull">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- PORTFOLIO PAGE -->
+      <div class="page" id="page-portfolio">
+        <div class="page-header">
+          <h1 class="page-title">Portfolio</h1>
+          <button class="btn-primary" id="newPortfolioBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Portfolio
+          </button>
+        </div>
+
+        <!-- Portfolio Overview Cards -->
+        <div class="portfolio-overview" id="portfolioOverview">
+          <div class="portfolio-stat-card">
+            <span class="stat-label">Total Value</span>
+            <span class="stat-value" id="totalValue">$127,845.32</span>
+            <span class="stat-change positive">+$2,341.15 (1.87%)</span>
+          </div>
+          <div class="portfolio-stat-card">
+            <span class="stat-label">Today's Gain</span>
+            <span class="stat-value positive" id="todayGain">+$1,205.40</span>
+            <span class="stat-change positive">+0.95%</span>
+          </div>
+          <div class="portfolio-stat-card">
+            <span class="stat-label">Total Gain</span>
+            <span class="stat-value positive" id="totalGain">+$27,845.32</span>
+            <span class="stat-change positive">+27.85%</span>
+          </div>
+        </div>
+
+        <!-- Portfolio Chart -->
+        <div class="portfolio-chart-section">
+          <div class="section-header">
+            <h2 class="section-title">Performance</h2>
+            <div class="section-tabs">
+              <button class="tab active">1D</button>
+              <button class="tab">1W</button>
+              <button class="tab">1M</button>
+              <button class="tab">1Y</button>
+            </div>
+          </div>
+          <div class="chart-container" id="portfolioChart">
+            <canvas id="portfolioCanvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Holdings -->
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">Holdings</h2>
+          </div>
+          <div class="holdings-list" id="holdingsList">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- EARNINGS PAGE -->
+      <div class="page" id="page-earnings">
+        <div class="page-header">
+          <h1 class="page-title">Earnings Calendar</h1>
+          <div class="section-tabs">
+            <button class="tab active">This Week</button>
+            <button class="tab">Next Week</button>
+            <button class="tab">Past</button>
+          </div>
+        </div>
+        <div class="earnings-grid" id="earningsGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- WATCHLIST PAGE -->
+      <div class="page" id="page-watchlist">
+        <div class="page-header">
+          <h1 class="page-title">Watchlist</h1>
+          <button class="btn-primary" id="addWatchBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Stock
+          </button>
+        </div>
+        <div class="watchlist-grid" id="watchlistGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- AI Search Modal -->
+      <div class="search-modal" id="searchModal">
+        <div class="search-modal-overlay" id="searchModalOverlay"></div>
+        <div class="search-modal-content">
+          <div class="search-modal-input-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="search-modal-input" placeholder="Ask about any stock, market, or financial topic..." id="modalSearchInput">
+            <kbd class="search-modal-esc">ESC</kbd>
+          </div>
+          <div class="search-modal-results" id="searchResults">
+            <div class="search-quick-links">
+              <p class="search-quick-label">Popular searches</p>
+              <a href="#" class="search-quick-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                NVDA stock analysis
+              </a>
+              <a href="#" class="search-quick-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                Compare AAPL vs MSFT
+              </a>
+              <a href="#" class="search-quick-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                Best performing ETFs this year
+              </a>
+              <a href="#" class="search-quick-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                Impact of tariffs on semiconductor stocks
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="./assets/app.js"></script>
   </body>
 </html>
