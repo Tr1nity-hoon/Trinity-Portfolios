@@ -255,23 +255,33 @@ function renderIndexCards(market) {
 
 function renderSentimentBar() {
   const container = document.getElementById('sentimentBar');
-  // Count bearish/bullish from headlines
   let bearish = 0, bullish = 0;
   MARKET_HEADLINES.forEach(h => {
     if (h.sentiment === 'bearish') bearish++;
     else bullish++;
   });
   const total = bearish + bullish;
-  const bearishPct = Math.round((bearish / total) * 100);
   const isBearish = bearish > bullish;
   const sentimentLabel = isBearish ? 'Bearish Sentiment' : 'Bullish Sentiment';
   const sentimentColor = isBearish ? 'var(--negative)' : 'var(--positive)';
+  const ratio = isBearish ? (bearish / total) : (bullish / total);
 
-  // Build bar segments
+  // Build bars with descending heights for bearish, ascending for bullish
   let bars = '';
-  for (let i = 0; i < 10; i++) {
-    const filled = i < Math.round((bearish / total) * 10);
-    bars += `<span class="sentiment-block ${filled ? 'filled-bearish' : 'filled-bullish'}"></span>`;
+  const barCount = 10;
+  for (let i = 0; i < barCount; i++) {
+    const filledCount = Math.round(ratio * barCount);
+    if (isBearish) {
+      // Bearish: tall bars on left descending to short on right (declining)
+      const height = 6 + Math.round((1 - i / (barCount - 1)) * 16);
+      const filled = i < filledCount;
+      bars += `<span class="sentiment-block" style="height:${height}px;background:${filled ? 'var(--negative)' : 'var(--text-muted)'};opacity:${filled ? 1 : 0.25}"></span>`;
+    } else {
+      // Bullish: short bars on left ascending to tall on right (rising)
+      const height = 6 + Math.round((i / (barCount - 1)) * 16);
+      const filled = i >= (barCount - filledCount);
+      bars += `<span class="sentiment-block" style="height:${height}px;background:${filled ? 'var(--positive)' : 'var(--text-muted)'};opacity:${filled ? 1 : 0.25}"></span>`;
+    }
   }
 
   container.innerHTML = `
@@ -329,13 +339,11 @@ function renderTrendingStocks() {
           <div class="stock-card-price">
             <div class="stock-card-price-value">$${formatNumber(stock.price)}</div>
             <div class="stock-card-price-change ${isPositive ? 'positive' : 'negative'}">
-              ${sign}${formatNumber(stock.change)} (${sign}${stock.pctChange.toFixed(2)}%)
+              ${sign}${stock.pctChange.toFixed(2)}%
             </div>
           </div>
         </div>
-        <div class="stock-card-chart">
-          <canvas data-stock="${stock.symbol}" style="width:100%;height:100%"></canvas>
-        </div>
+        <canvas class="stock-card-sparkline-bg" data-stock="${stock.symbol}"></canvas>
       </div>
     `;
   }).join('');
@@ -344,7 +352,7 @@ function renderTrendingStocks() {
     trending.forEach(stock => {
       const canvas = container.querySelector(`[data-stock="${stock.symbol}"]`);
       const color = stock.change >= 0 ? '#22c55e' : '#ef4444';
-      const fill = stock.change >= 0 ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)';
+      const fill = stock.change >= 0 ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)';
       drawSparkline(canvas, stock.data, color, fill);
     });
   });
@@ -594,18 +602,20 @@ function renderWatchlist() {
     const sign = isPositive ? '+' : '';
     return `
       <div class="watchlist-card">
-        <div class="watchlist-info">
-          <div class="watchlist-icon">${stock.symbol.slice(0, 2)}</div>
-          <div>
-            <div class="watchlist-symbol">${stock.symbol}</div>
-            <div class="watchlist-name">${stock.name}</div>
+        <div class="watchlist-card-top">
+          <div class="watchlist-info">
+            <div class="watchlist-icon">${stock.symbol.slice(0, 2)}</div>
+            <div>
+              <div class="watchlist-symbol">${stock.symbol}</div>
+              <div class="watchlist-name">${stock.name}</div>
+            </div>
+          </div>
+          <div class="watchlist-price-group">
+            <div class="watchlist-price">$${formatNumber(stock.price)}</div>
+            <div class="watchlist-change ${isPositive ? 'positive' : 'negative'}">${sign}${stock.pctChange.toFixed(2)}%</div>
           </div>
         </div>
-        <div class="watchlist-data">
-          <canvas class="watchlist-sparkline" data-watch="${stock.symbol}" style="width:60px;height:28px"></canvas>
-          <div class="watchlist-price">$${formatNumber(stock.price)}</div>
-          <div class="watchlist-change ${isPositive ? 'positive' : 'negative'}">${sign}${stock.pctChange.toFixed(2)}%</div>
-        </div>
+        <canvas class="watchlist-sparkline-bg" data-watch="${stock.symbol}"></canvas>
       </div>
     `;
   }).join('');
@@ -614,7 +624,8 @@ function renderWatchlist() {
     watchStocks.forEach(stock => {
       const canvas = container.querySelector(`[data-watch="${stock.symbol}"]`);
       const color = stock.change >= 0 ? '#22c55e' : '#ef4444';
-      drawSparkline(canvas, stock.data, color, null);
+      const fill = stock.change >= 0 ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)';
+      drawSparkline(canvas, stock.data, color, fill);
     });
   });
 }
@@ -663,21 +674,28 @@ function initNavigation() {
     });
   });
 
-  // Market Overview tab switching
-  document.querySelectorAll('#marketOverviewTabs .tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      renderIndexCards(tab.dataset.marketTab);
+  // Market Overview tab switching - use event delegation for reliability
+  const marketTabs = document.getElementById('marketOverviewTabs');
+  if (marketTabs) {
+    marketTabs.addEventListener('click', (e) => {
+      const tab = e.target.closest('.tab');
+      if (tab && tab.dataset.marketTab) {
+        e.preventDefault();
+        e.stopPropagation();
+        renderIndexCards(tab.dataset.marketTab);
+      }
     });
-  });
+  }
 
   // Generic tab interactions (visual toggle for other tabs)
   document.querySelectorAll('.section-tabs').forEach(tabGroup => {
-    if (tabGroup.id === 'marketOverviewTabs') return; // handled above
-    tabGroup.querySelectorAll('.tab').forEach(tab => {
-      tab.addEventListener('click', () => {
+    if (tabGroup.id === 'marketOverviewTabs') return;
+    tabGroup.addEventListener('click', (e) => {
+      const tab = e.target.closest('.tab');
+      if (tab) {
         tabGroup.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
-      });
+      }
     });
   });
 }
