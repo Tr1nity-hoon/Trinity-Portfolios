@@ -667,16 +667,10 @@ table { border-collapse: collapse; width: 100%; }
 
 .heatmap-full {
   display: flex;
-  flex-wrap: wrap;
-  gap: 3px;
+  flex-direction: column;
+  gap: 8px;
   border-radius: var(--radius-md);
   overflow: hidden;
-}
-
-.heatmap-full .heatmap-cell {
-  flex: 1 1 auto;
-  min-width: 72px;
-  padding: 14px 8px;
 }
 
 .heatmap-legend {
@@ -1223,13 +1217,6 @@ table { border-collapse: collapse; width: 100%; }
   align-items: center;
   justify-content: center;
   background: var(--bg-primary);
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.login-page.hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
 }
 
 .login-container {
@@ -1510,6 +1497,179 @@ table { border-collapse: collapse; width: 100%; }
 .btn-logout:hover {
   background: var(--negative-bg);
   color: var(--negative);
+}
+
+/* --- Sentiment Bar --- */
+.sentiment-bar {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.sentiment-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.sentiment-blocks {
+  display: flex;
+  gap: 2px;
+}
+
+.sentiment-block {
+  width: 6px;
+  height: 18px;
+  border-radius: 2px;
+}
+
+.sentiment-block.filled-bearish {
+  background: var(--negative);
+}
+
+.sentiment-block.filled-bullish {
+  background: var(--text-muted);
+  opacity: 0.4;
+}
+
+.sentiment-label {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.sentiment-meta {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+/* --- Summary Accordion --- */
+.summary-accordion {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.accordion-item {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.accordion-item:last-child {
+  border-bottom: none;
+}
+
+.accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  gap: 16px;
+}
+
+.accordion-header:hover {
+  background: var(--bg-card-hover);
+}
+
+.accordion-title {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.accordion-chevron {
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+  transition: transform var(--transition-base);
+}
+
+.accordion-item.open .accordion-chevron {
+  transform: rotate(180deg);
+}
+
+.accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  padding: 0 20px;
+}
+
+.accordion-item.open .accordion-body {
+  max-height: 300px;
+  padding: 0 20px 16px;
+}
+
+.accordion-body p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+/* --- Treemap Heatmap --- */
+.treemap-sector {
+  margin-bottom: 4px;
+}
+
+.treemap-sector-header {
+  padding: 8px 12px 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.treemap-sector-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.treemap-sector-change {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.treemap-sector-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.treemap-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.treemap-cell:hover {
+  transform: scale(1.03);
+  z-index: 2;
+  box-shadow: var(--shadow-md);
+}
+
+.treemap-cell-symbol {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.treemap-cell-change {
+  font-size: 10px;
+  font-weight: 500;
+  font-family: var(--font-mono);
+  margin-top: 1px;
 }
 
 /* --- Utilities --- */

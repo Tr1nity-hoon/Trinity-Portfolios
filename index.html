@@ -178,10 +178,10 @@
         <section class="section">
           <div class="section-header">
             <h2 class="section-title">Market Overview</h2>
-            <div class="section-tabs">
-              <button class="tab active">US Market</button>
-              <button class="tab">Crypto</button>
-              <button class="tab">Global</button>
+            <div class="section-tabs" id="marketOverviewTabs">
+              <button class="tab active" data-market-tab="us">US Market</button>
+              <button class="tab" data-market-tab="crypto">Crypto</button>
+              <button class="tab" data-market-tab="global">Global</button>
             </div>
           </div>
           <div class="index-cards" id="indexCards">
@@ -189,17 +189,19 @@
           </div>
         </section>
 
+        <!-- Sentiment Indicator -->
+        <div class="sentiment-bar" id="sentimentBar">
+          <!-- Populated by JS -->
+        </div>
+
         <!-- Market Summary -->
         <section class="section">
           <div class="section-header">
             <h2 class="section-title">Market Summary</h2>
-            <span class="badge">AI Generated</span>
+            <span class="badge" id="summaryUpdated">Updated 3 minutes ago</span>
           </div>
-          <div class="ai-summary-card" id="aiSummary">
-            <div class="ai-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a4 4 0 014 4c0 1.1-.9 2-2 2h-4c-1.1 0-2-.9-2-2a4 4 0 014-4z"/><path d="M8 8v8a4 4 0 004 4 4 4 0 004-4V8"/><line x1="6" y1="12" x2="18" y2="12"/></svg>
-            </div>
-            <p>U.S. equities rallied on Friday as the S&P 500 gained 1.2% following stronger-than-expected jobs data. Tech led the advance with NVDA up 4.3% on AI chip demand optimism. Treasury yields held steady at 4.25%, while the VIX dropped to 14.2, suggesting reduced market anxiety. The Fed is widely expected to hold rates at its next meeting.</p>
+          <div class="summary-accordion" id="summaryAccordion">
+            <!-- Populated by JS -->
           </div>
         </section>
 
