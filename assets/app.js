@@ -2,7 +2,10 @@
 // Trinity Finance — Interactive Dashboard
 // ============================================
 
-// --- Mock Data ---
+const FINNHUB_KEY = 'd6ep8bhr01qksaq9dcb0d6ep8bhr01qksaq9dcbg';
+const FINNHUB_BASE = 'https://finnhub.io/api/v1';
+
+// --- Mock Data (fallback) ---
 const MARKET_DATA = {
   us: [
     { name: 'S&P 500', symbol: 'SPX', value: 5892.34, change: 72.41, pctChange: 1.24 },
@@ -126,6 +129,81 @@ const MARKET_HEADLINES = [
   }
 ];
 
+// --- Finnhub API ---
+let apiCallCount = 0;
+const API_RATE_LIMIT = 25; // Finnhub free tier: 30/sec, we stay conservative
+
+async function fetchStockQuote(symbol) {
+  // Skip symbols with dots (like BRK.B) - Finnhub may not support them
+  const cleanSymbol = symbol.replace('.', '-');
+  try {
+    const response = await fetch(`${FINNHUB_BASE}/quote?symbol=${cleanSymbol}&token=${FINNHUB_KEY}`);
+    if (!response.ok) return null;
+    const data = await response.json();
+    if (data && data.c > 0) {
+      return {
+        currentPrice: data.c,
+        change: data.d,
+        pctChange: data.dp,
+        high: data.h,
+        low: data.l,
+        open: data.o,
+        prevClose: data.pc
+      };
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function fetchRealPrices() {
+  // Fetch prices for a batch of important stocks
+  const prioritySymbols = ['NVDA', 'AAPL', 'MSFT', 'AMZN', 'GOOGL', 'META', 'TSLA', 'JPM', 'V', 'AMD', 'NFLX', 'UNH', 'XOM', 'LLY', 'MA', 'WMT', 'COST', 'CRM', 'MU', 'HD'];
+
+  const batchSize = 5;
+  for (let i = 0; i < prioritySymbols.length; i += batchSize) {
+    const batch = prioritySymbols.slice(i, i + batchSize);
+    const promises = batch.map(sym => fetchStockQuote(sym).then(data => ({ sym, data })));
+    const results = await Promise.all(promises);
+
+    results.forEach(({ sym, data }) => {
+      if (data) {
+        const stock = STOCKS.find(s => s.symbol === sym);
+        if (stock) {
+          stock.price = data.currentPrice;
+          stock.change = data.change || 0;
+          stock.pctChange = data.pctChange || 0;
+        }
+        // Update holdings too
+        const holding = HOLDINGS.find(h => h.symbol === sym);
+        if (holding) {
+          holding.currentPrice = data.currentPrice;
+        }
+      }
+    });
+
+    // Rate limit: wait between batches
+    if (i + batchSize < prioritySymbols.length) {
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+  }
+
+  // Re-render affected views
+  const activePage = document.querySelector('.page.active');
+  if (activePage) {
+    if (activePage.id === 'page-home') {
+      renderTrendingStocks();
+    } else if (activePage.id === 'page-markets') {
+      renderStockTable();
+    } else if (activePage.id === 'page-watchlist') {
+      renderWatchlist();
+    } else if (activePage.id === 'page-portfolio') {
+      renderPortfolio();
+    }
+  }
+}
+
 // --- Utility Functions ---
 function generateSparklineData(length = 20, volatility = 0.02, trend = 0) {
   const data = [100];
@@ -218,7 +296,6 @@ function renderIndexCards(market) {
   const indices = MARKET_DATA[market] || MARKET_DATA.us;
   const container = document.getElementById('indexCards');
 
-  // Generate sparkline data for these indices
   indices.forEach(idx => {
     if (!idx.data) idx.data = generateSparklineData(30, 0.015, idx.pctChange > 0 ? 0.02 : -0.02);
   });
@@ -247,7 +324,6 @@ function renderIndexCards(market) {
     });
   });
 
-  // Update active tab
   document.querySelectorAll('#marketOverviewTabs .tab').forEach(tab => {
     tab.classList.toggle('active', tab.dataset.marketTab === market);
   });
@@ -266,18 +342,15 @@ function renderSentimentBar() {
   const sentimentColor = isBearish ? 'var(--negative)' : 'var(--positive)';
   const ratio = isBearish ? (bearish / total) : (bullish / total);
 
-  // Build bars with descending heights for bearish, ascending for bullish
   let bars = '';
   const barCount = 10;
   for (let i = 0; i < barCount; i++) {
     const filledCount = Math.round(ratio * barCount);
     if (isBearish) {
-      // Bearish: tall bars on left descending to short on right (declining)
       const height = 6 + Math.round((1 - i / (barCount - 1)) * 16);
       const filled = i < filledCount;
       bars += `<span class="sentiment-block" style="height:${height}px;background:${filled ? 'var(--negative)' : 'var(--text-muted)'};opacity:${filled ? 1 : 0.25}"></span>`;
     } else {
-      // Bullish: short bars on left ascending to tall on right (rising)
       const height = 6 + Math.round((i / (barCount - 1)) * 16);
       const filled = i >= (barCount - filledCount);
       bars += `<span class="sentiment-block" style="height:${height}px;background:${filled ? 'var(--positive)' : 'var(--text-muted)'};opacity:${filled ? 1 : 0.25}"></span>`;
@@ -307,14 +380,11 @@ function renderSummaryAccordion() {
     </div>
   `).join('');
 
-  // Add click handlers
   container.querySelectorAll('.accordion-header').forEach(btn => {
     btn.addEventListener('click', () => {
       const item = btn.parentElement;
       const wasOpen = item.classList.contains('open');
-      // Close all
       container.querySelectorAll('.accordion-item').forEach(el => el.classList.remove('open'));
-      // Toggle current
       if (!wasOpen) item.classList.add('open');
     });
   });
@@ -358,34 +428,18 @@ function renderTrendingStocks() {
   });
 }
 
-function renderHeatmapPreview() {
-  const container = document.getElementById('heatmapPreview');
-  const previewStocks = STOCKS.slice(0, 16);
-  container.innerHTML = previewStocks.map(stock => {
-    const textColor = getHeatmapTextColor(stock.pctChange);
-    return `
-      <div class="heatmap-cell" style="background:${getHeatmapColor(stock.pctChange)}">
-        <div class="heatmap-cell-symbol" style="color:${textColor}">${stock.symbol}</div>
-        <div class="heatmap-cell-change" style="color:${textColor}">${stock.pctChange >= 0 ? '+' : ''}${stock.pctChange.toFixed(2)}%</div>
-      </div>
-    `;
-  }).join('');
-}
-
 function renderHeatmapFull() {
   const container = document.getElementById('heatmapFull');
   let html = '';
 
   for (const [sectorName, sectorData] of Object.entries(HEATMAP_SECTORS)) {
     const sectorStocks = sectorData.stocks.map(sym => STOCKS.find(s => s.symbol === sym)).filter(Boolean);
-    // Sort by market cap descending
     sectorStocks.sort((a, b) => (b.mcapVal || 0) - (a.mcapVal || 0));
 
     const sectorChange = sectorData.change;
     const sectorChangeStr = sectorChange >= 0 ? `+${sectorChange.toFixed(2)}%` : `${sectorChange.toFixed(2)}%`;
     const sectorColor = sectorChange >= 0 ? 'var(--positive)' : 'var(--negative)';
 
-    // Total market cap for sizing
     const totalMcap = sectorStocks.reduce((sum, s) => sum + (s.mcapVal || 100), 0);
 
     html += `<div class="treemap-sector">`;
@@ -443,6 +497,25 @@ function renderStockTable() {
 
 function renderPortfolio() {
   const container = document.getElementById('holdingsList');
+
+  // Calculate totals
+  let totalValue = 0, totalCost = 0;
+  HOLDINGS.forEach(h => {
+    totalValue += h.shares * h.currentPrice;
+    totalCost += h.shares * h.avgCost;
+  });
+  const totalGain = totalValue - totalCost;
+  const totalGainPct = (totalGain / totalCost) * 100;
+
+  // Update stat cards
+  const tvEl = document.getElementById('totalValue');
+  const tgEl = document.getElementById('totalGain');
+  if (tvEl) tvEl.textContent = `$${formatNumber(totalValue)}`;
+  if (tgEl) {
+    tgEl.textContent = `${totalGain >= 0 ? '+' : ''}$${formatNumber(Math.abs(totalGain))}`;
+    tgEl.className = `stat-value ${totalGain >= 0 ? 'positive' : 'negative'}`;
+  }
+
   container.innerHTML = HOLDINGS.map(h => {
     const value = h.shares * h.currentPrice;
     const cost = h.shares * h.avgCost;
@@ -544,54 +617,139 @@ function drawPortfolioChart() {
   ctx.stroke();
 }
 
-function renderEarnings() {
-  const container = document.getElementById('earningsGrid');
-  container.innerHTML = EARNINGS.map(e => {
-    const isReported = e.status === 'reported';
-    return `
-      <div class="earnings-card">
-        <div class="earnings-card-header">
-          <div class="earnings-card-title">
-            <div class="stock-logo">${e.symbol.slice(0, 2)}</div>
-            <div>
-              <div class="earnings-card-symbol">${e.symbol}</div>
-              <div class="earnings-card-name">${e.name}</div>
+let currentEarningsTab = 'upcoming';
+
+function renderEarnings(filter) {
+  filter = filter || currentEarningsTab;
+  currentEarningsTab = filter;
+
+  const statsContainer = document.getElementById('earningsStats');
+  const timelineContainer = document.getElementById('earningsTimeline');
+
+  // Filter earnings
+  let filtered = EARNINGS;
+  if (filter === 'upcoming') filtered = EARNINGS.filter(e => e.status === 'upcoming');
+  else if (filter === 'reported') filtered = EARNINGS.filter(e => e.status === 'reported');
+
+  // Stats
+  const totalUpcoming = EARNINGS.filter(e => e.status === 'upcoming').length;
+  const totalReported = EARNINGS.filter(e => e.status === 'reported').length;
+  const beats = EARNINGS.filter(e => e.status === 'reported' && e.beat).length;
+  const misses = EARNINGS.filter(e => e.status === 'reported' && !e.beat).length;
+
+  statsContainer.innerHTML = `
+    <div class="earnings-stat">
+      <span class="earnings-stat-number">${totalUpcoming}</span>
+      <span class="earnings-stat-label">Upcoming</span>
+    </div>
+    <div class="earnings-stat">
+      <span class="earnings-stat-number">${totalReported}</span>
+      <span class="earnings-stat-label">Reported</span>
+    </div>
+    <div class="earnings-stat">
+      <span class="earnings-stat-number earnings-beat">${beats}</span>
+      <span class="earnings-stat-label">Beats</span>
+    </div>
+    <div class="earnings-stat">
+      <span class="earnings-stat-number earnings-miss">${misses}</span>
+      <span class="earnings-stat-label">Misses</span>
+    </div>
+  `;
+
+  // Group by date
+  const grouped = {};
+  filtered.forEach(e => {
+    if (!grouped[e.date]) grouped[e.date] = [];
+    grouped[e.date].push(e);
+  });
+
+  let html = '';
+  for (const [date, items] of Object.entries(grouped)) {
+    html += `
+      <div class="earnings-date-group">
+        <div class="earnings-date-header">
+          <div class="earnings-date-dot"></div>
+          <span class="earnings-date-text">${date}, 2026</span>
+        </div>
+        <div class="earnings-date-cards">
+    `;
+
+    items.forEach(e => {
+      const isReported = e.status === 'reported';
+      const stock = STOCKS.find(s => s.symbol === e.symbol);
+      const price = stock ? `$${formatNumber(stock.price)}` : '';
+      const priceChange = stock ? (stock.change >= 0 ? `+${stock.pctChange.toFixed(2)}%` : `${stock.pctChange.toFixed(2)}%`) : '';
+      const priceClass = stock && stock.change >= 0 ? 'positive' : 'negative';
+
+      html += `
+        <div class="earnings-card ${isReported ? (e.beat ? 'earnings-card-beat' : 'earnings-card-miss') : ''}">
+          <div class="earnings-card-header">
+            <div class="earnings-card-title">
+              <div class="stock-logo">${e.symbol.slice(0, 2)}</div>
+              <div>
+                <div class="earnings-card-symbol">${e.symbol}</div>
+                <div class="earnings-card-name">${e.name}</div>
+              </div>
+            </div>
+            <div class="earnings-card-meta">
+              <span class="earnings-card-time">${e.time === 'AMC' ? 'After Close' : 'Before Open'}</span>
+              ${isReported ? `<span class="earnings-badge ${e.beat ? 'badge-beat' : 'badge-miss'}">${e.beat ? 'Beat' : 'Miss'}</span>` : '<span class="earnings-badge badge-upcoming">Upcoming</span>'}
             </div>
           </div>
-          <div class="earnings-card-date">${e.date} ${e.time}</div>
+          <div class="earnings-card-body">
+            ${isReported ? `
+              <div class="earnings-row">
+                <div class="earnings-metric">
+                  <span class="earnings-metric-label">EPS Actual</span>
+                  <span class="earnings-metric-value ${e.beat ? 'earnings-beat' : 'earnings-miss'}">${e.actEPS}</span>
+                </div>
+                <div class="earnings-metric">
+                  <span class="earnings-metric-label">EPS Est.</span>
+                  <span class="earnings-metric-value">${e.estEPS}</span>
+                </div>
+                <div class="earnings-metric">
+                  <span class="earnings-metric-label">Rev Actual</span>
+                  <span class="earnings-metric-value ${e.beat ? 'earnings-beat' : 'earnings-miss'}">${e.actRev}</span>
+                </div>
+                <div class="earnings-metric">
+                  <span class="earnings-metric-label">Rev Est.</span>
+                  <span class="earnings-metric-value">${e.estRev}</span>
+                </div>
+              </div>
+            ` : `
+              <div class="earnings-row">
+                <div class="earnings-metric">
+                  <span class="earnings-metric-label">EPS Est.</span>
+                  <span class="earnings-metric-value">${e.estEPS}</span>
+                </div>
+                <div class="earnings-metric">
+                  <span class="earnings-metric-label">Rev Est.</span>
+                  <span class="earnings-metric-value">${e.estRev}</span>
+                </div>
+                <div class="earnings-metric">
+                  <span class="earnings-metric-label">Price</span>
+                  <span class="earnings-metric-value">${price}</span>
+                </div>
+                <div class="earnings-metric">
+                  <span class="earnings-metric-label">Change</span>
+                  <span class="earnings-metric-value ${priceClass}">${priceChange}</span>
+                </div>
+              </div>
+            `}
+          </div>
         </div>
-        <div class="earnings-card-body">
-          ${isReported ? `
-            <div class="earnings-metric">
-              <span class="earnings-metric-label">EPS Actual</span>
-              <span class="earnings-metric-value ${e.beat ? 'earnings-beat' : 'earnings-miss'}">${e.actEPS}</span>
-            </div>
-            <div class="earnings-metric">
-              <span class="earnings-metric-label">EPS Est.</span>
-              <span class="earnings-metric-value">${e.estEPS}</span>
-            </div>
-            <div class="earnings-metric">
-              <span class="earnings-metric-label">Revenue Actual</span>
-              <span class="earnings-metric-value ${e.beat ? 'earnings-beat' : 'earnings-miss'}">${e.actRev}</span>
-            </div>
-            <div class="earnings-metric">
-              <span class="earnings-metric-label">Revenue Est.</span>
-              <span class="earnings-metric-value">${e.estRev}</span>
-            </div>
-          ` : `
-            <div class="earnings-metric">
-              <span class="earnings-metric-label">EPS Est.</span>
-              <span class="earnings-metric-value">${e.estEPS}</span>
-            </div>
-            <div class="earnings-metric">
-              <span class="earnings-metric-label">Revenue Est.</span>
-              <span class="earnings-metric-value">${e.estRev}</span>
-            </div>
-          `}
-        </div>
-      </div>
-    `;
-  }).join('');
+      `;
+    });
+
+    html += `</div></div>`;
+  }
+
+  timelineContainer.innerHTML = html;
+
+  // Update active tab
+  document.querySelectorAll('#earningsTabs .tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.earningsTab === filter);
+  });
 }
 
 function renderWatchlist() {
@@ -674,7 +832,7 @@ function initNavigation() {
     });
   });
 
-  // Market Overview tab switching - use event delegation for reliability
+  // Market Overview tab switching
   const marketTabs = document.getElementById('marketOverviewTabs');
   if (marketTabs) {
     marketTabs.addEventListener('click', (e) => {
@@ -687,9 +845,22 @@ function initNavigation() {
     });
   }
 
+  // Earnings tab switching
+  const earningsTabs = document.getElementById('earningsTabs');
+  if (earningsTabs) {
+    earningsTabs.addEventListener('click', (e) => {
+      const tab = e.target.closest('.tab');
+      if (tab && tab.dataset.earningsTab) {
+        e.preventDefault();
+        e.stopPropagation();
+        renderEarnings(tab.dataset.earningsTab);
+      }
+    });
+  }
+
   // Generic tab interactions (visual toggle for other tabs)
   document.querySelectorAll('.section-tabs').forEach(tabGroup => {
-    if (tabGroup.id === 'marketOverviewTabs') return;
+    if (tabGroup.id === 'marketOverviewTabs' || tabGroup.id === 'earningsTabs') return;
     tabGroup.addEventListener('click', (e) => {
       const tab = e.target.closest('.tab');
       if (tab) {
@@ -727,6 +898,7 @@ function initSearchModal() {
   const overlay = document.getElementById('searchModalOverlay');
   const input = document.getElementById('searchInput');
   const modalInput = document.getElementById('modalSearchInput');
+  const resultsContainer = document.getElementById('searchResults');
 
   function openModal() {
     modal.classList.add('open');
@@ -736,7 +908,90 @@ function initSearchModal() {
   function closeModal() {
     modal.classList.remove('open');
     modalInput.value = '';
+    showDefaultResults();
   }
+
+  function showDefaultResults() {
+    resultsContainer.innerHTML = `
+      <div class="search-quick-links">
+        <p class="search-quick-label">Popular searches</p>
+        <a href="#" class="search-quick-item" data-search="NVDA">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          NVDA stock analysis
+        </a>
+        <a href="#" class="search-quick-item" data-search="AAPL">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Compare AAPL vs MSFT
+        </a>
+        <a href="#" class="search-quick-item" data-search="ETF">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Best performing ETFs this year
+        </a>
+      </div>
+    `;
+  }
+
+  function performSearch(query) {
+    if (!query.trim()) {
+      showDefaultResults();
+      return;
+    }
+
+    const q = query.toLowerCase();
+    const matchedStocks = STOCKS.filter(s =>
+      s.symbol.toLowerCase().includes(q) ||
+      s.name.toLowerCase().includes(q) ||
+      s.sector.toLowerCase().includes(q)
+    ).slice(0, 8);
+
+    if (matchedStocks.length === 0) {
+      resultsContainer.innerHTML = `
+        <div class="search-no-results">
+          <p>No results found for "${query}"</p>
+          <p class="search-no-results-hint">Try searching for a stock symbol, company name, or sector</p>
+        </div>
+      `;
+      return;
+    }
+
+    resultsContainer.innerHTML = `
+      <div class="search-results-list">
+        <p class="search-quick-label">Stocks</p>
+        ${matchedStocks.map(stock => {
+          const isPositive = stock.change >= 0;
+          const sign = isPositive ? '+' : '';
+          return `
+            <div class="search-result-item" data-symbol="${stock.symbol}">
+              <div class="search-result-info">
+                <div class="stock-logo">${stock.symbol.slice(0, 2)}</div>
+                <div>
+                  <div class="search-result-symbol">${stock.symbol}</div>
+                  <div class="search-result-name">${stock.name} &middot; ${stock.sector}</div>
+                </div>
+              </div>
+              <div class="search-result-price">
+                <div class="search-result-price-val">$${formatNumber(stock.price)}</div>
+                <div class="search-result-change ${isPositive ? 'positive' : 'negative'}">${sign}${stock.pctChange.toFixed(2)}%</div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+
+    // Add click handlers for search results
+    resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+      item.addEventListener('click', () => {
+        closeModal();
+        navigateTo('markets');
+      });
+    });
+  }
+
+  // Live search
+  modalInput.addEventListener('input', () => {
+    performSearch(modalInput.value);
+  });
 
   input.addEventListener('focus', (e) => {
     e.preventDefault();
@@ -747,7 +1002,10 @@ function initSearchModal() {
   document.querySelectorAll('.suggestion-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       openModal();
-      setTimeout(() => { modalInput.value = chip.textContent; }, 100);
+      setTimeout(() => {
+        modalInput.value = chip.textContent;
+        performSearch(chip.textContent);
+      }, 100);
     });
   });
 
@@ -788,6 +1046,7 @@ function initAuth() {
   const loginForm = document.getElementById('loginForm');
   const loginError = document.getElementById('loginError');
   const googleSignIn = document.getElementById('googleSignIn');
+  const showSignup = document.getElementById('showSignup');
   const logoutBtn = document.getElementById('logoutBtn');
   const userMenu = document.getElementById('userMenu');
   const userAvatar = document.getElementById('userAvatar');
@@ -798,8 +1057,13 @@ function initAuth() {
   const mainContent = document.getElementById('mainContent');
 
   function getUser() {
-    const data = localStorage.getItem('trinity-user');
-    return data ? JSON.parse(data) : null;
+    try {
+      const data = localStorage.getItem('trinity-user');
+      return data ? JSON.parse(data) : null;
+    } catch (e) {
+      localStorage.removeItem('trinity-user');
+      return null;
+    }
   }
 
   function setUser(user) {
@@ -841,51 +1105,115 @@ function initAuth() {
   }
 
   // Email/password login
-  loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    loginError.textContent = '';
+  if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      loginError.textContent = '';
 
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
 
-    if (!email || !password) {
-      loginError.textContent = 'Please enter both email and password.';
-      return;
-    }
+      if (!email || !password) {
+        loginError.textContent = 'Please enter both email and password.';
+        return;
+      }
 
-    if (password.length < 6) {
-      loginError.textContent = 'Password must be at least 6 characters.';
-      return;
-    }
+      if (password.length < 6) {
+        loginError.textContent = 'Password must be at least 6 characters.';
+        return;
+      }
 
-    const user = {
-      name: email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-      email: email,
-      provider: 'email'
-    };
-    setUser(user);
-    showApp(user);
-  });
+      const user = {
+        name: email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+        email: email,
+        provider: 'email'
+      };
+      setUser(user);
+      showApp(user);
+    });
+  }
 
   // Google Sign-In (simulated)
-  googleSignIn.addEventListener('click', () => {
-    loginError.textContent = '';
-    const user = {
-      name: 'Google User',
-      email: 'user@gmail.com',
-      provider: 'google'
-    };
-    setUser(user);
-    showApp(user);
-  });
+  if (googleSignIn) {
+    googleSignIn.addEventListener('click', (e) => {
+      e.preventDefault();
+      loginError.textContent = '';
+      const user = {
+        name: 'Google User',
+        email: 'user@gmail.com',
+        provider: 'google'
+      };
+      setUser(user);
+      showApp(user);
+    });
+  }
+
+  // Sign Up link
+  if (showSignup) {
+    showSignup.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Switch to signup mode - reuse the same form
+      const loginTitle = document.querySelector('.login-title');
+      const loginSubtitle = document.querySelector('.login-subtitle');
+      const submitBtn = document.querySelector('.btn-login');
+      const footer = document.querySelector('.login-footer');
+
+      if (loginTitle.textContent === 'Welcome back') {
+        // Switch to signup mode
+        loginTitle.textContent = 'Create account';
+        loginSubtitle.textContent = 'Sign up to start tracking your portfolios';
+        submitBtn.textContent = 'Sign up';
+        footer.innerHTML = '<p>Already have an account? <a href="#" class="form-link" id="showLogin">Sign in</a></p>';
+
+        // Re-attach login link
+        document.getElementById('showLogin').addEventListener('click', (e2) => {
+          e2.preventDefault();
+          loginTitle.textContent = 'Welcome back';
+          loginSubtitle.textContent = 'Sign in to access your portfolios and market data';
+          submitBtn.textContent = 'Sign in';
+          footer.innerHTML = '<p>Don\'t have an account? <a href="#" class="form-link" id="showSignup">Sign up</a></p>';
+          // Re-initialize signup handler
+          initSignupHandler();
+        });
+      }
+    });
+  }
+
+  function initSignupHandler() {
+    const signupLink = document.getElementById('showSignup');
+    if (signupLink) {
+      signupLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        const loginTitle = document.querySelector('.login-title');
+        const loginSubtitle = document.querySelector('.login-subtitle');
+        const submitBtn = document.querySelector('.btn-login');
+        const footer = document.querySelector('.login-footer');
+
+        loginTitle.textContent = 'Create account';
+        loginSubtitle.textContent = 'Sign up to start tracking your portfolios';
+        submitBtn.textContent = 'Sign up';
+        footer.innerHTML = '<p>Already have an account? <a href="#" class="form-link" id="showLogin">Sign in</a></p>';
+
+        document.getElementById('showLogin').addEventListener('click', (e2) => {
+          e2.preventDefault();
+          loginTitle.textContent = 'Welcome back';
+          loginSubtitle.textContent = 'Sign in to access your portfolios and market data';
+          submitBtn.textContent = 'Sign in';
+          footer.innerHTML = '<p>Don\'t have an account? <a href="#" class="form-link" id="showSignup">Sign up</a></p>';
+          initSignupHandler();
+        });
+      });
+    }
+  }
 
   // Logout
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
+    logoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       clearUser();
       showLogin();
-      loginForm.reset();
-      loginError.textContent = '';
+      if (loginForm) loginForm.reset();
+      if (loginError) loginError.textContent = '';
     });
   }
 }
@@ -897,8 +1225,10 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSentimentBar();
   renderSummaryAccordion();
   renderTrendingStocks();
-  renderHeatmapPreview();
   initNavigation();
   initThemeToggle();
   initSearchModal();
+
+  // Fetch real prices from Finnhub API
+  fetchRealPrices();
 });
