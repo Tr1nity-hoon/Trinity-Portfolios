@@ -11,6 +11,65 @@
     <link rel="stylesheet" href="./assets/style.css">
   </head>
   <body>
+    <!-- LOGIN PAGE -->
+    <div class="login-page" id="loginPage">
+      <div class="login-container">
+        <div class="login-card">
+          <div class="login-header">
+            <div class="login-logo">
+              <svg width="36" height="36" viewBox="0 0 28 28" fill="none">
+                <path d="M14 2L2 8v12l12 6 12-6V8L14 2z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <path d="M14 2v24M2 8l12 6 12-6" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              </svg>
+              <span class="login-logo-text">Trinity</span>
+            </div>
+            <h1 class="login-title">Welcome back</h1>
+            <p class="login-subtitle">Sign in to access your portfolios and market data</p>
+          </div>
+
+          <!-- Google Sign-In Button -->
+          <button class="btn-google" id="googleSignIn">
+            <svg width="18" height="18" viewBox="0 0 18 18">
+              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+              <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.997 8.997 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 2.58 9 2.58z" fill="#EA4335"/>
+            </svg>
+            Continue with Google
+          </button>
+
+          <div class="login-divider">
+            <span>or</span>
+          </div>
+
+          <!-- Email/Password Form -->
+          <form class="login-form" id="loginForm">
+            <div class="form-group">
+              <label class="form-label" for="loginEmail">Email</label>
+              <input type="email" class="form-input" id="loginEmail" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="loginPassword">Password</label>
+              <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" required>
+            </div>
+            <div class="form-row">
+              <label class="form-checkbox">
+                <input type="checkbox" id="rememberMe">
+                <span>Remember me</span>
+              </label>
+              <a href="#" class="form-link">Forgot password?</a>
+            </div>
+            <button type="submit" class="btn-login">Sign in</button>
+            <div class="login-error" id="loginError"></div>
+          </form>
+
+          <div class="login-footer">
+            <p>Don't have an account? <a href="#" class="form-link" id="showSignup">Sign up</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
@@ -51,6 +110,16 @@
       </nav>
 
       <div class="sidebar-footer">
+        <div class="user-menu" id="userMenu" style="display:none">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div style="flex:1;min-width:0">
+            <div class="user-name" id="userName">User</div>
+            <div class="user-email" id="userEmail">user@example.com</div>
+          </div>
+          <button class="btn-logout" id="logoutBtn" title="Sign out">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
         <button class="theme-toggle" id="themeToggle" title="Toggle theme">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="icon-sun"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="icon-moon"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
@@ -109,10 +178,10 @@
         <section class="section">
           <div class="section-header">
             <h2 class="section-title">Market Overview</h2>
-            <div class="section-tabs">
-              <button class="tab active">US Market</button>
-              <button class="tab">Crypto</button>
-              <button class="tab">Global</button>
+            <div class="section-tabs" id="marketOverviewTabs">
+              <button class="tab active" data-market-tab="us">US Market</button>
+              <button class="tab" data-market-tab="crypto">Crypto</button>
+              <button class="tab" data-market-tab="global">Global</button>
             </div>
           </div>
           <div class="index-cards" id="indexCards">
@@ -120,17 +189,19 @@
           </div>
         </section>
 
+        <!-- Sentiment Indicator -->
+        <div class="sentiment-bar" id="sentimentBar">
+          <!-- Populated by JS -->
+        </div>
+
         <!-- Market Summary -->
         <section class="section">
           <div class="section-header">
             <h2 class="section-title">Market Summary</h2>
-            <span class="badge">AI Generated</span>
+            <span class="badge" id="summaryUpdated">Updated 3 minutes ago</span>
           </div>
-          <div class="ai-summary-card" id="aiSummary">
-            <div class="ai-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a4 4 0 014 4c0 1.1-.9 2-2 2h-4c-1.1 0-2-.9-2-2a4 4 0 014-4z"/><path d="M8 8v8a4 4 0 004 4 4 4 0 004-4V8"/><line x1="6" y1="12" x2="18" y2="12"/></svg>
-            </div>
-            <p>U.S. equities rallied on Friday as the S&P 500 gained 1.2% following stronger-than-expected jobs data. Tech led the advance with NVDA up 4.3% on AI chip demand optimism. Treasury yields held steady at 4.25%, while the VIX dropped to 14.2, suggesting reduced market anxiety. The Fed is widely expected to hold rates at its next meeting.</p>
+          <div class="summary-accordion" id="summaryAccordion">
+            <!-- Populated by JS -->
           </div>
         </section>
 
