@@ -1678,7 +1678,6 @@ table { border-collapse: collapse; width: 100%; }
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 16px 20px;
   background: transparent;
   color: var(--text-primary);
@@ -1687,7 +1686,7 @@ table { border-collapse: collapse; width: 100%; }
   text-align: left;
   cursor: pointer;
   transition: background var(--transition-fast);
-  gap: 16px;
+  gap: 12px;
 }
 
 .accordion-header:hover {
@@ -1971,4 +1970,66 @@ table { border-collapse: collapse; width: 100%; }
   font-size: 13px;
   color: var(--text-tertiary);
   margin-top: 4px;
+}
+
+/* --- Stock Logo Wrapper --- */
+.stock-logo-wrap {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stock-logo-wrap img {
+  display: block;
+}
+
+/* --- Refresh Button --- */
+.summary-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-refresh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  transition: all var(--transition-fast);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-refresh:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.btn-refresh.spinning svg {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* --- Accordion Sentiment Dot --- */
+.accordion-sentiment-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* --- Google Signing In Spinner --- */
+.spinning-icon {
+  animation: spin 1s linear infinite;
 }
